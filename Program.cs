@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Collections;
 
-namespace SwitchBoardApplication
+namespace SwitchBoardStimulation
 {
     class Program
     {
@@ -42,10 +42,10 @@ namespace SwitchBoardApplication
                 bulbList.Add(new Bulb(i));
             }
 
-            checkState(fanList, acList, bulbList);
-            menuShow(fanList, acList, bulbList);
+            CheckState(fanList, acList, bulbList);
+            MenuShow(fanList, acList, bulbList);
             var selectedThing = Convert.ToInt32(Console.ReadLine());
-            useItem(selectedThing, fanList, acList, bulbList);
+            UseItem(selectedThing, fanList, acList, bulbList);
             //Console.WriteLine(selectedItem);
 
 
@@ -53,8 +53,13 @@ namespace SwitchBoardApplication
 
 
         //  TURN ON OR TURN OFF THE SELECTED ITEM
-        public static void useItem(int id, List<Fan> fanList, List<Ac> acList, List<Bulb> bulbList)
-        {   
+        public static void UseItem(int id, List<Fan> fanList, List<Ac> acList, List<Bulb> bulbList)
+        {   while (id > fanList.Count + acList.Count + bulbList.Count || id < 1) 
+            {
+                System.Console.WriteLine("Plese enter the correct value among the given menu: ");
+                NextInput(fanList, acList, bulbList);
+                
+            }
             if (id <= fanList.Count)
             {
                 var tempFan = (from fan in fanList
@@ -65,13 +70,13 @@ namespace SwitchBoardApplication
                 var selectedOption = Convert.ToUInt32(Console.ReadLine());
                 if (selectedOption == 1)
                 {
-                    tempFan[0].stateChange();
-                    nextInput(fanList, acList, bulbList);
+                    tempFan[0].StateChange();
+                    NextInput(fanList, acList, bulbList);
                     
                 }
                 else if(selectedOption == 2)
                 {
-                    nextInput(fanList, acList, bulbList);
+                    NextInput(fanList, acList, bulbList);
                 }
             }
 
@@ -85,13 +90,13 @@ namespace SwitchBoardApplication
                 var selectedOption = Convert.ToUInt32(Console.ReadLine());
                 if (selectedOption == 1)
                 {
-                    tempAc[0].stateChange();
-                    nextInput(fanList, acList, bulbList);
+                    tempAc[0].StateChange();
+                    NextInput(fanList, acList, bulbList);
 
                 }
                 else if (selectedOption == 2)
                 {
-                    nextInput(fanList, acList, bulbList);
+                    NextInput(fanList, acList, bulbList);
                 }
             }
             else
@@ -104,20 +109,20 @@ namespace SwitchBoardApplication
                 var selectedOption = Convert.ToUInt32(Console.ReadLine());
                 if (selectedOption == 1)
                 {
-                    tempBulb[0].stateChange();
-                    nextInput(fanList, acList, bulbList);
+                    tempBulb[0].StateChange();
+                    NextInput(fanList, acList, bulbList);
 
                 }
                 else if (selectedOption == 2)
                 {
-                    nextInput(fanList, acList, bulbList);
+                    NextInput(fanList, acList, bulbList);
                 }
             }
         }
         
 
         //    MENU CREATING FUNCTION
-        public static void menuShow(List<Fan> fanList, List<Ac> acList, List<Bulb> bulbList)
+        public static void MenuShow(List<Fan> fanList, List<Ac> acList, List<Bulb> bulbList)
         {
             int id = 1;
             var listFan = from fan in fanList select "Fan "+fan.fanName;
@@ -147,7 +152,7 @@ namespace SwitchBoardApplication
         
 
         // STATUS SHOWING FUNCTION OF ELECTRIC ITEMS
-        public static void checkState(List<Fan> fanList,List<Ac> acList,List<Bulb> bulbList)
+        public static void CheckState(List<Fan> fanList,List<Ac> acList,List<Bulb> bulbList)
         {
             var fanListDetails = (from fan in fanList
                                  where fan.stateFan is false
@@ -183,12 +188,12 @@ namespace SwitchBoardApplication
             }
         }
 
-        public static void nextInput(List<Fan> fanList, List<Ac> acList, List<Bulb> bulbList)
+        public static void NextInput(List<Fan> fanList, List<Ac> acList, List<Bulb> bulbList)
         {
-            checkState(fanList, acList, bulbList);
-            menuShow(fanList, acList, bulbList);
+            CheckState(fanList, acList, bulbList);
+            MenuShow(fanList, acList, bulbList);
             var selectedItem = Convert.ToInt32(Console.ReadLine());
-            useItem(selectedItem, fanList, acList, bulbList);
+            UseItem(selectedItem, fanList, acList, bulbList);
         }
         
     }
