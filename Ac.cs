@@ -6,26 +6,15 @@ using System.Threading.Tasks;
 
 namespace SwitchBoardStimulation
 {
-    class Ac : Iappliance
+    class Ac : Appliance
     {
-        public int acName { get; set; }
-        public Boolean stateAC { get; set; }
+        
         public Ac(int id)
         {
-            this.acName = id;
-            this.stateAC = false;
+            this.Name = id;
+            this.State = "\"Off\"";
         }
 
-        public void StateChange()
-        {
-            if (stateAC == false)
-            {
-                stateAC = true;
-            }
-            else
-            {
-                stateAC = false;
-            }
-        }
+        
     }
 }

@@ -6,15 +6,11 @@ using System.Threading.Tasks;
 
 namespace SwitchBoardStimulation
 {
-    class Bulb : Appliance
+    class Appliance
     {
-        
-        public Bulb(int id)
-        {
-            this.Name = id;
-            this.State = "\"Off\"";
-        }
+        public int Name { get; set; }
 
-        
+        public string State { get; set; }
+
     }
 }

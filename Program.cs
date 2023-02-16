@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Collections;
+using System.Security.Cryptography.X509Certificates;
 
 namespace SwitchBoardStimulation
 {
@@ -10,42 +11,19 @@ namespace SwitchBoardStimulation
     {
         public static void Main()
         {
-            Console.Write("1. Number of Fans: ");
-            int fanCount = Convert.ToInt32(Console.ReadLine());
-            Console.Write("2. Number of ACs: ");
-            int acCount = Convert.ToInt32(Console.ReadLine());
-            Console.Write("3. Number of bulbs: ");
-            int bulbCount = Convert.ToInt32(Console.ReadLine());
 
+            FanService fanService = new();
+            AcService acService = new();
+            BulbService bulbService = new();
 
-            //created the fan appliances
-            List<Fan> fanList = new();
-
-            for(int i=1;i<=fanCount;i++)
-            {
-                fanList.Add(new Fan(i));
-            }
-
-            //created the AC appliances
-            List<Ac> acList = new();
-
-            for (int i = 1; i <= acCount; i++)
-            {
-                acList.Add(new Ac(i));
-            }
-
-            //created the AC appliances
-            List<Bulb> bulbList = new();
-
-            for (int i = 1; i <= bulbCount; i++)
-            {
-                bulbList.Add(new Bulb(i));
-            }
+            var fanList = fanService.fanList;
+            var acList = acService.acList;
+            var bulbList = bulbService.bulbList;
 
             CheckState(fanList, acList, bulbList);
             MenuShow(fanList, acList, bulbList);
             var selectedThing = Convert.ToInt32(Console.ReadLine());
-            UseItem(selectedThing, fanList, acList, bulbList);
+            UseItem(selectedThing, fanService, acService, bulbService);
             //Console.WriteLine(selectedItem);
 
 
@@ -53,69 +31,71 @@ namespace SwitchBoardStimulation
 
 
         //  TURN ON OR TURN OFF THE SELECTED ITEM
-        public static void UseItem(int id, List<Fan> fanList, List<Ac> acList, List<Bulb> bulbList)
-        {   while (id > fanList.Count + acList.Count + bulbList.Count || id < 1) 
+        public static void UseItem(int id, FanService fanService, AcService acService, BulbService bulbService)
+        {
+            var fanList = fanService.fanList;
+            var acList = acService.acList;
+            var bulbList = bulbService.bulbList;
+            while (id > fanList.Count + acList.Count + bulbList.Count || id < 1) 
             {
                 System.Console.WriteLine("Plese enter the correct value among the given menu: ");
-                NextInput(fanList, acList, bulbList);
+                NextInput(fanService,acService,bulbService);
                 
             }
             if (id <= fanList.Count)
             {
                 var tempFan = (from fan in fanList
-                              where fan.fanName == id
+                              where fan.Name == id
                               select fan).ToList();
-                Console.WriteLine("1. Fan" + tempFan[0].fanName.ToString()+" is " + !(tempFan[0].stateFan));
-                Console.WriteLine("2. Back");
+                fanService.AskStateChange(tempFan[0].Name);
                 var selectedOption = Convert.ToUInt32(Console.ReadLine());
                 if (selectedOption == 1)
                 {
-                    tempFan[0].StateChange();
-                    NextInput(fanList, acList, bulbList);
-                    
+                    fanService.StateChange(tempFan[0].Name);
+                    NextInput(fanService, acService, bulbService);
+
                 }
                 else if(selectedOption == 2)
                 {
-                    NextInput(fanList, acList, bulbList);
+                    NextInput(fanService, acService, bulbService);
                 }
+                
             }
 
             else if(id>fanList.Count && id<=fanList.Count+acList.Count) 
             {
                 var tempAc = (from ac in acList
-                              where ac.acName == id - fanList.Count()
+                              where ac.Name == id - fanList.Count
                               select ac).ToList();
-                Console.WriteLine("1. AC" + tempAc[0].acName.ToString() + " is " + !(tempAc[0].stateAC));
-                Console.WriteLine("2. Back");
+                acService.AskStateChange(tempAc[0].Name);
                 var selectedOption = Convert.ToUInt32(Console.ReadLine());
                 if (selectedOption == 1)
                 {
-                    tempAc[0].StateChange();
-                    NextInput(fanList, acList, bulbList);
+                    acService.StateChange(tempAc[0].Name);
+                    NextInput(fanService, acService, bulbService);
 
                 }
                 else if (selectedOption == 2)
                 {
-                    NextInput(fanList, acList, bulbList);
+                    NextInput(fanService, acService, bulbService);
                 }
             }
             else
             {
                 var tempBulb = (from bulb in bulbList
-                                where bulb.bulbName == id - fanList.Count() - acList.Count()
+                                where bulb.Name == id - fanList.Count - acList.Count
                                 select bulb).ToList();
-                Console.WriteLine("1. Bulb" + tempBulb[0].bulbName.ToString() + " is " + !(tempBulb[0].stateBulb));
-                Console.WriteLine("2. Back");
+                bulbService.AskStateChange(tempBulb[0].Name);
                 var selectedOption = Convert.ToUInt32(Console.ReadLine());
                 if (selectedOption == 1)
                 {
-                    tempBulb[0].StateChange();
-                    NextInput(fanList, acList, bulbList);
+                    bulbService.StateChange(tempBulb[0].Name);
+                    NextInput(fanService, acService, bulbService);
 
                 }
                 else if (selectedOption == 2)
                 {
-                    NextInput(fanList, acList, bulbList);
+                    NextInput(fanService, acService, bulbService);
                 }
             }
         }
@@ -125,9 +105,9 @@ namespace SwitchBoardStimulation
         public static void MenuShow(List<Fan> fanList, List<Ac> acList, List<Bulb> bulbList)
         {
             int id = 1;
-            var listFan = from fan in fanList select "Fan "+fan.fanName;
-            var listAc = from ac in acList select "AC "+ac.acName;
-            var listbulb = from bulb in bulbList select "bulb "+bulb.bulbName;
+            var listFan = from fan in fanList select "Fan "+fan.Name;
+            var listAc = from ac in acList select "AC "+ac.Name;
+            var listbulb = from bulb in bulbList select "bulb "+bulb.Name;
             Console.WriteLine();
             Console.WriteLine("Here is the list of items you can Choose: ");
             foreach(var f in listFan)
@@ -154,24 +134,15 @@ namespace SwitchBoardStimulation
         // STATUS SHOWING FUNCTION OF ELECTRIC ITEMS
         public static void CheckState(List<Fan> fanList,List<Ac> acList,List<Bulb> bulbList)
         {
-            var fanListDetails = (from fan in fanList
-                                 where fan.stateFan is false
-                                 select "Fan " + fan.fanName + " is \"Off\"")
-                                 .Union(from fan in fanList
-                                        where fan.stateFan is true
-                                        select "Fan " + fan.fanName + " is \"On\"");
-            var acListDetails = (from ac in acList
-                                where ac.stateAC is false
-                                select "AC " + ac.acName + " is \"Off\"")
-                                .Union(from ac in acList
-                                       where ac.stateAC is true
-                                       select "AC " + ac.acName + " is \"On\"");
-            var bulbListDetails = (from bulb in bulbList
-                                  where bulb.stateBulb is false
-                                  select "Bulb " + bulb.bulbName + " is \"Off\"")
-                                  .Union(from bulb in bulbList
-                                         where bulb.stateBulb is true
-                                         select "Bulb " + bulb.bulbName + " is \"On\"");
+            var fanListDetails = from fan in fanList
+                                 select "Fan " + fan.Name + " is " + fan.State;
+                                 
+            var acListDetails = from ac in acList
+                                select "AC " + ac.Name + " is "+ac.State;
+                                
+            var bulbListDetails = from bulb in bulbList
+                                  select "Bulb " + bulb.Name + " is "+bulb.State;
+                                  
 
             Console.WriteLine();
             foreach (var result in fanListDetails)
@@ -188,12 +159,15 @@ namespace SwitchBoardStimulation
             }
         }
 
-        public static void NextInput(List<Fan> fanList, List<Ac> acList, List<Bulb> bulbList)
+        public static void NextInput(FanService fanService, AcService acService, BulbService bulbService)
         {
+            var fanList = fanService.fanList;
+            var acList = acService.acList;
+            var bulbList = bulbService.bulbList;
             CheckState(fanList, acList, bulbList);
             MenuShow(fanList, acList, bulbList);
             var selectedItem = Convert.ToInt32(Console.ReadLine());
-            UseItem(selectedItem, fanList, acList, bulbList);
+            UseItem(selectedItem, fanService, acService, bulbService);
         }
         
     }

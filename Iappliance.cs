@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace SwitchBoardStimulation
 {
-    interface Iappliance
+    interface IAppliance
     {
-        void StateChange();
+        void StateChange(int id);
+        void AskStateChange(int id);
     }
+    
 }
